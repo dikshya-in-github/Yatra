@@ -59,6 +59,14 @@
         <div class="hero-bg"></div>
         <div class="hero-overlay"></div>
 
+        <!-- Decorative animated sky layer (shared styles in homeLogged.css) -->
+        <div class="hero-sky" aria-hidden="true">
+            <i class="fa-solid fa-cloud cloud cloud-1"></i>
+            <i class="fa-solid fa-cloud cloud cloud-2"></i>
+            <i class="fa-solid fa-cloud cloud cloud-3"></i>
+            <i class="fa-solid fa-plane sky-plane"></i>
+        </div>
+
         <div class="container hero-content reveal">
             <h1 class="hero-title">Your Journey Begins Here</h1>
             <p class="hero-subtitle">Discover the best flights to Nepal's most breathtaking destinations</p>
@@ -606,6 +614,11 @@
     </footer>
 
     <script src="assets/js/homeLogged.js"></script>
+
+    <!-- Back to top (shared styles + JS) -->
+    <button class="back-to-top" id="backToTop" aria-label="Back to top">
+        <i class="fa-solid fa-plane-up"></i>
+    </button>
 </body>
 
 </html>

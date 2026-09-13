@@ -39,6 +39,21 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // ==========================================
+    // 3b. BACK TO TOP (site-wide pattern — ticketStatus skips
+    //     homeLogged.js, so the shared behavior is wired here)
+    // ==========================================
+    const backToTop = document.getElementById('backToTop');
+    if (backToTop) {
+        const toggleBackToTop = () => backToTop.classList.toggle('show', window.scrollY > 500);
+        window.addEventListener('scroll', toggleBackToTop, { passive: true });
+        toggleBackToTop();
+        backToTop.addEventListener('click', () => {
+            const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+            window.scrollTo({ top: 0, behavior: reduceMotion ? 'auto' : 'smooth' });
+        });
+    }
+
+    // ==========================================
     // 3. SCROLL REVEAL (same as home.js)
     // ==========================================
     const revealElements = document.querySelectorAll('.reveal');

@@ -175,7 +175,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (entry.isIntersecting) {
                 const el = entry.target;
                 const target = parseInt(el.dataset.target);
-                const suffix = el.textContent.includes('%') ? '%' : '';
+                const suffix = el.textContent.includes('%') ? '%' : el.textContent.includes('K+') ? 'K+' : '';
                 const duration = 2000;
                 const start = performance.now();
 
@@ -295,7 +295,22 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // ==========================================
-    // 12. DRAGGABLE HORIZONTAL SLIDER
+    // 12. BACK TO TOP (site-wide — appears on pages
+    //     that include the #backToTop button markup)
+    // ==========================================
+    const backToTop = document.getElementById('backToTop');
+    if (backToTop) {
+        const toggleBackToTop = () => backToTop.classList.toggle('show', window.scrollY > 500);
+        window.addEventListener('scroll', toggleBackToTop, { passive: true });
+        toggleBackToTop();
+        backToTop.addEventListener('click', () => {
+            const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+            window.scrollTo({ top: 0, behavior: reduceMotion ? 'auto' : 'smooth' });
+        });
+    }
+
+    // ==========================================
+    // 13. DRAGGABLE HORIZONTAL SLIDER
     // ==========================================
     const slider = document.querySelector('.dest-slider-container');
     let isDown = false;

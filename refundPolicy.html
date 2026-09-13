@@ -65,6 +65,14 @@
     <header class="page-hero">
         <div class="hero-bg"></div>
         <div class="hero-overlay"></div>
+
+        <!-- Decorative animated sky layer (shared styles in homeLogged.css) -->
+        <div class="hero-sky" aria-hidden="true">
+            <i class="fa-solid fa-cloud cloud cloud-1"></i>
+            <i class="fa-solid fa-cloud cloud cloud-2"></i>
+            <i class="fa-solid fa-cloud cloud cloud-3"></i>
+            <i class="fa-solid fa-plane sky-plane"></i>
+        </div>
         <div class="container">
             <nav class="breadcrumb reveal active">
                 <a href="./homeLogged.html">Home</a> <i class="fa-solid fa-chevron-right"></i> <span class="current">Refund Policy</span>
@@ -595,6 +603,11 @@
     <script src="assets/js/homeLogged.js"></script>
     <!-- Page-specific JS (FAQ accordion + fee estimator) -->
     <script src="assets/js/refundPolicy.js"></script>
+
+    <!-- Back to top (shared styles + JS) -->
+    <button class="back-to-top" id="backToTop" aria-label="Back to top">
+        <i class="fa-solid fa-plane-up"></i>
+    </button>
 </body>
 
 </html>
