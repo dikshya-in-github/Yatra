@@ -1638,3 +1638,13 @@ input:checked + .toggle-slider:before {
 .mobile-user-name {
   color: var(--primary);
 }
+
+/* Full menu (11 links) — compact on short screens so nothing overflows */
+@media (max-height: 760px) {
+  .mobile-menu {
+    gap: 1.1rem;
+  }
+  .mobile-menu a {
+    font-size: 1.15rem;
+  }
+}
