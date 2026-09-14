@@ -1,0 +1,173 @@
+/* =====================================================
+   ESEWA STEP 3 — Confirmation (+ insufficient / cancel)
+   Tokens, header, footer: esewaOtp.css + esewaLogin.css
+   (linked before this file). Page styles only.
+   ===================================================== */
+
+.confirm-page { position: relative; }
+
+/* Dimmed layer behind the modal */
+.confirm-backdrop {
+    position: fixed; inset: 0;
+    background: rgba(6, 10, 18, 0.72);
+    backdrop-filter: blur(2px);
+    z-index: 0;
+}
+
+/* ---------- Modal layer ---------- */
+.modal-layer {
+    position: relative;
+    z-index: 1;
+    display: flex; align-items: flex-start; justify-content: center;
+    padding: 4.5rem 1rem 3rem;
+    animation: mIn 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+}
+@keyframes mIn {
+    from { opacity: 0; transform: translateY(22px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+.confirm-card {
+    position: relative;
+    width: min(720px, 100%);
+    background: #232b3d;
+    border-radius: 12px;
+    padding: 2.25rem 2.5rem 2rem;
+    box-shadow: 0 30px 70px rgba(0, 0, 0, 0.5);
+}
+.confirm-card h1 { font-size: 1.5rem; font-weight: 700; }
+.m-sub { color: var(--esw-muted); font-size: 0.95rem; margin-top: 0.25rem; }
+.m-rule { border: none; border-top: 2px solid rgba(111, 206, 85, 0.55); margin: 1.25rem 0 1.5rem; }
+.modal-x {
+    position: absolute; top: 1.1rem; right: 1.1rem;
+    background: none; border: none; cursor: pointer;
+    color: var(--esw-muted); font-size: 1.25rem;
+    transition: var(--transition);
+}
+.modal-x:hover { color: var(--esw-text); transform: rotate(90deg); }
+
+/* ---------- Payment options ---------- */
+.m-label { font-weight: 700; font-size: 0.98rem; margin-bottom: 0.85rem; }
+.pay-options { display: grid; grid-template-columns: 1fr 1fr; gap: 1.1rem; margin-bottom: 1.5rem; }
+.opt {
+    display: flex; align-items: center; gap: 0.85rem;
+    text-align: left; font-family: inherit;
+    background: rgba(255, 255, 255, 0.02);
+    border: 1.5px solid rgba(255, 255, 255, 0.08);
+    border-radius: 12px; padding: 0.95rem 1.1rem;
+    color: var(--esw-text); cursor: pointer;
+    transition: var(--transition);
+}
+.opt:hover { border-color: rgba(111, 206, 85, 0.4); }
+.opt.selected { border-color: var(--esw-green); background: rgba(111, 206, 85, 0.07); }
+.opt-icon {
+    position: relative;
+    width: 46px; height: 46px; flex-shrink: 0;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.06);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.15rem; color: var(--esw-muted);
+}
+.opt-icon.wallet { background: #1f7a33; color: #fff; font-weight: 800; }
+.opt-e { font-style: italic; }
+.opt-check {
+    position: absolute; bottom: -2px; right: -2px;
+    font-size: 0.95rem; color: var(--esw-green);
+    background: #232b3d; border-radius: 50%;
+    display: none;
+}
+.opt.selected .opt-check { display: block; }
+.opt-txt strong { display: block; font-size: 0.95rem; }
+.opt-txt small { color: var(--esw-muted); font-size: 0.78rem; }
+
+/* ---------- Details grid ---------- */
+.conf-grid {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 1.15rem 1.5rem; margin-bottom: 1.5rem;
+}
+.conf-grid small {
+    display: block; color: var(--esw-muted);
+    font-size: 0.68rem; font-weight: 700; letter-spacing: 0.12em;
+    margin-bottom: 0.2rem;
+}
+.conf-grid b { font-size: 0.98rem; }
+.conf-grid .wide { grid-column: 1 / -1; }
+
+/* ---------- Amounts ---------- */
+.conf-amounts { display: flex; flex-direction: column; gap: 0.6rem; }
+.ca-row {
+    display: flex; justify-content: space-between;
+    background: rgba(15, 21, 34, 0.55);
+    border-radius: 6px; padding: 1rem 1.25rem;
+}
+.ca-row span { color: var(--esw-muted); font-weight: 600; }
+.ca-row.promo-val, .ca-promo b { color: var(--esw-green); }
+.ca-total {
+    display: flex; justify-content: space-between; align-items: center;
+    background: rgba(15, 21, 34, 0.8);
+    border-radius: 8px; padding: 1.15rem 1.25rem;
+    font-size: 1.05rem;
+}
+.ca-total .npr { color: var(--esw-green); margin-right: 0.2rem; }
+
+/* ---------- Action buttons ---------- */
+.m-actions { display: flex; gap: 1rem; margin-top: 1.6rem; }
+.m-actions.end { justify-content: flex-end; }
+.btn-light, .btn-white {
+    font-family: inherit; font-weight: 800; letter-spacing: 0.1em;
+    font-size: 0.85rem; cursor: pointer;
+    border-radius: 8px; padding: 0.95rem 1.9rem;
+    border: none; color: #1c2333; background: #e9edf3;
+    transition: var(--transition);
+}
+.btn-light:hover, .btn-white:hover { background: #ffffff; }
+.btn-white { color: #3a4356; }
+.btn-green {
+    font-family: inherit; font-weight: 800; letter-spacing: 0.1em;
+    font-size: 0.85rem; cursor: pointer;
+    border-radius: 8px; padding: 0.95rem 1.9rem;
+    border: none; color: #182614; background: var(--esw-sage);
+    transition: var(--transition);
+}
+.btn-green:hover:not(:disabled) { background: var(--esw-green); }
+.btn-green:disabled { opacity: 0.75; cursor: wait; }
+.btn-red {
+    font-family: inherit; font-weight: 800; letter-spacing: 0.1em;
+    font-size: 0.85rem; cursor: pointer;
+    border-radius: 8px; padding: 0.95rem 1.9rem;
+    border: none; color: #fff; background: #c0392b;
+    transition: var(--transition);
+}
+.btn-red:hover { background: #a93226; }
+
+/* ---------- Stacked modals (insufficient / cancel) ---------- */
+.esw-modal {
+    position: fixed; inset: 0; z-index: 10;
+    display: flex; align-items: flex-start; justify-content: center;
+    padding: 7.5rem 1rem 3rem;
+    background: rgba(6, 10, 18, 0.35);
+}
+.esw-modal.on-top { z-index: 20; }
+.modal-card {
+    position: relative;
+    width: min(560px, 100%);
+    background: #2a3348;
+    border-radius: 12px;
+    padding: 2rem 2.25rem 1.75rem;
+    box-shadow: 0 30px 70px rgba(0, 0, 0, 0.55);
+    animation: mIn 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.modal-card h2 { font-size: 1.35rem; font-weight: 700; }
+.modal-card.small { width: min(520px, 100%); }
+.m-text { font-size: 0.98rem; line-height: 1.7; margin-top: 1.25rem; }
+[hidden] { display: none !important; }
+
+/* ---------- Responsive ---------- */
+@media (max-width: 640px) {
+    .modal-layer { padding-top: 3rem; }
+    .confirm-card { padding: 1.75rem 1.4rem 1.5rem; }
+    .pay-options, .conf-grid { grid-template-columns: 1fr; }
+    .m-actions { flex-direction: column-reverse; }
+    .m-actions .btn-green, .m-actions .btn-light,
+    .m-actions .btn-white, .m-actions .btn-red { width: 100%; }
+    .esw-modal { padding-top: 5rem; }
+}

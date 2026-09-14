@@ -1759,6 +1759,169 @@ input:checked + .toggle-slider:before {
   transform: translateY(-4px);
 }
 
+/* =========================================
+   BOOKING WIZARD (searchFlight → eticket)
+   Shared wizard band + stepper + timer + slim footer.
+   Used by: searchFlight.html, booking.html,
+   payment.html, eticket.html
+   ========================================= */
+
+/* Dark band under the navbar that carries the steps */
+.wizard-band {
+  background: linear-gradient(135deg, var(--dark) 0%, #1e293b 100%);
+  padding: 115px 0 2rem;
+}
+
+/* Horizontal stepper — circles on the dark band.
+   Covers both markups: <ol class="steps"> (searchFlight/
+   eticket) and <div class="stepper"> (booking/payment). */
+.steps,
+.stepper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  row-gap: 0.75rem;
+}
+.step {
+  display: flex;
+  align-items: center;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.6);
+}
+.step + .step::before {
+  content: "";
+  width: 72px;
+  border-top: 2px dotted rgba(255, 255, 255, 0.35);
+  margin: 0 1rem;
+}
+/* Connector divs used by the booking/payment markup */
+.step-line {
+  width: 72px;
+  border-top: 2px dotted rgba(255, 255, 255, 0.35);
+  margin: 0 1rem;
+}
+.step-line.done {
+  border-top-color: rgba(110, 231, 183, 0.6);
+}
+.step-num,
+.step-circle {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  margin-right: 0.6rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.12);
+  border: 2px solid rgba(255, 255, 255, 0.4);
+  font-size: 0.85rem;
+  font-weight: 800;
+  transition: var(--transition);
+  flex-shrink: 0;
+}
+.step.active {
+  color: var(--white);
+}
+.step.active .step-num,
+.step.active .step-circle {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: var(--white);
+  box-shadow: 0 0 0 5px rgba(14, 163, 113, 0.22);
+}
+.step.done .step-num,
+.step.completed .step-circle {
+  background: rgba(14, 163, 113, 0.55);
+  border-color: transparent;
+  color: var(--white);
+  font-size: 0.75rem;
+}
+.step.done .step-label,
+.step.completed .step-label {
+  color: rgba(255, 255, 255, 0.85);
+}
+
+/* Timer pill (booking.html / payment.html) */
+.timer-bar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  background: var(--white);
+  padding: 1rem 1.5rem;
+  border-radius: var(--radius-full);
+  box-shadow: var(--shadow-sm);
+  max-width: 520px;
+  margin: 1.5rem auto 0;
+  font-size: 0.95rem;
+  color: var(--slate);
+}
+.timer-bar i {
+  color: var(--primary);
+  font-size: 1.2rem;
+}
+.timer-bar strong {
+  color: var(--dark);
+}
+.timer-bar.warning {
+  background: #fff7ed;
+  border: 1px solid #fed7aa;
+}
+.timer-bar.warning strong {
+  color: var(--accent);
+}
+.timer-bar.danger {
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  animation: timerPulse 1s infinite;
+}
+.timer-bar.danger strong {
+  color: var(--accent);
+}
+@keyframes timerPulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.85;
+  }
+}
+
+/* Slim wizard footer — just the © line (long footer
+   intentionally omitted on booking-flow pages) */
+.wizard-footer {
+  background: var(--dark);
+  padding: 1.25rem 0;
+}
+.wizard-footer p {
+  text-align: center;
+  font-size: 0.85rem;
+  color: var(--slate-light);
+}
+
+/* Stepper on small screens: numbers + active/done label */
+@media (max-width: 768px) {
+  .wizard-band {
+    padding: 105px 0 1.75rem;
+  }
+  .step + .step::before,
+  .step-line {
+    width: 28px;
+    margin: 0 0.6rem;
+  }
+  .step-label {
+    display: none;
+  }
+  .step.active .step-label,
+  .step.done .step-label,
+  .step.completed .step-label {
+    display: inline;
+  }
+}
+
 /* Reduced motion — honor user preference for all
    shared animations (reveal, sky layer, back-to-top) */
 @media (prefers-reduced-motion: reduce) {
@@ -1771,6 +1934,9 @@ input:checked + .toggle-slider:before {
   }
   .hero-sky .cloud,
   .hero-sky .sky-plane {
+    animation: none;
+  }
+  .timer-bar.danger {
     animation: none;
   }
   .back-to-top {

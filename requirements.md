@@ -12,7 +12,7 @@
 > Never mark something complete that has not actually been built and verified.
 
 - **Saved:** 2026-09-13 (Session 4) — from the author's complete project specification
-- **Last progress update:** 2026-09-13 (Session 4)
+- **Last progress update:** 2026-09-14 (Session 10)
 
 ---
 
@@ -22,7 +22,7 @@
 
 | Phase | Scope | Status |
 |---|---|---|
-| Phase 1 — Frontend | HTML/CSS/vanilla JS, mock data | **IN PROGRESS (~60%)** |
+| Phase 1 — Frontend | HTML/CSS/vanilla JS, mock data | **IN PROGRESS (~75%)** |
 | Phase 2 — Backend | Java + Spring MVC + Hibernate + MySQL (N-tier) | NOT STARTED (blocked until frontend booking workflow is stable) |
 | Phase 3 — Integration | Connect frontend to live Spring API, CORS, Postman | NOT STARTED |
 
@@ -31,10 +31,10 @@
 | Step | Page | Status |
 |---|---|---|
 | 0. Home + Search | home.html / homeLogged.html | ✅ DONE |
-| 1. Select Flights | flightListing.html | ⬜ NOT STARTED |
-| 2. Passenger Details | passenger-details.html | ⬜ NOT STARTED |
-| 3. Payment Method | payment.html | ⬜ NOT STARTED |
-| 4. E-ticket | e-ticket.html | ⬜ NOT STARTED |
+| 1. Select Flights | searchFlight.html *(author's page — replaces the spec's flightListing.html)* | ✅ DONE |
+| 2. Passenger Details | booking.html | ✅ DONE (renders N Adult/Child forms from the search split; contact + every passenger validated; sidebar + `bookingData.flight` read `yatra_selected_flight`; timer persisted for payment.html) |
+| 3. Payment Method | payment.html | ✅ DONE (eSewa → mock gateway is the only integrated path; other methods intentionally blocked for now) |
+| 4. E-ticket | eticket.html | ✅ DONE (reached via the eSewa path; all data flows from the gateway transaction) |
 
 ### Completed frontend pages (Phase 1)
 
@@ -51,23 +51,43 @@
 - [x] refundPolicy.html (FAQ accordion, fee estimator)
 - [x] login.html / signup.html (standalone, mock submit)
 - [x] Shared design system: homeLogged.css + homeLogged.js (navbar, menu, footer, reveal, hero-sky, back-to-top, reduced-motion)
+- [x] searchFlight.html/css/js — flight listing (author-built; date strip, fare classes, policy modal, select → booking.html)
+- [x] booking.html/css/js — passenger details (contact + passenger forms, validation, SSR toggle, 15-min timer)
+- [x] payment.html/css/js — payment method (card/bank options + eSewa, promo field, timer resumes from sessionStorage)
+- [x] eticket.html/css/js — e-ticket (route/PNR/ticket no., fare breakdown, barcodes, print)
+- [x] eSewa gateway mock: esewaLogin → esewaOtp → esewaBalance → esewaConfirm (captcha, OTP, wallet balance, txn saved)
 - [ ] admin.html — ❌ intentionally unfinished (raw JSP placeholder, rework later)
+
+### Protected files (current)
+
+- [ ] admin.html — do not touch (user reworks later)
+
+~~flightListing.html~~ — restriction removed 2026-09-14: the author built
+`searchFlight.html` themselves, so it is the flight-listing page now. Only
+`admin.html` remains protected.
 
 ### Priority Task Checklist (spec §43, in order)
 
-- [ ] 1. Build flightListing.html
-- [ ] 2. Build mock flight data (`mock-data.js`)
-- [ ] 3. Build `flights.js`
-- [x] 4. Connect homeLogged search → flight listing *(partial: sessionStorage `flightSearchData` + redirect already work in homeLogged.js; landing page itself missing)*
-- [ ] 5. Implement filtering (flight listing)
-- [ ] 6. Implement pagination (flight listing)
-- [ ] 7. Implement select flight (save to sessionStorage)
-- [ ] 8. Build passenger-details.html
-- [ ] 9. Build `booking.js`
-- [ ] 10. Build payment.html
-- [ ] 11. Build `payment.js`
-- [ ] 12. Build e-ticket.html
-- [ ] 13. Build `ticket.js`
+> **Note (2026-09-14):** the author built the flight listing themselves as
+> `searchFlight.*`, which supersedes spec items 1–3 and 5–7 in one page (filtering
+> is done via the date strip + fare-class pills instead of spec-style filters/
+pagination). Names differ from the spec (booking.html not passenger-details.html,
+eticket.html not e-ticket.html) — treat the built pages as the reference.
+
+- [x] 1. ~~Build flightListing.html~~ → built by author as searchFlight.html
+- [x] 2. ~~Build mock flight data~~ → inline in searchFlight.js (schedules, fares, airlines)
+- [x] 3. ~~Build `flights.js`~~ → logic lives in searchFlight.js
+- [x] 4. Connect homeLogged search → flight listing *(redirect fixed 2026-09-14: homeLogged.js now maps `flightSearchData` to `./searchFlight.html?from=&to=&date=&pax=`)*
+- [x] 5. Implement filtering → date strip (±3 days) + fare-class pills + price/refund live updates
+- [x] 5b. Show airline on flight cards (logo images from Wikimedia in `assets/imgs/airline-*` with IATA-code-badge fallback, 5 real Nepali carriers: Buddha U4, Yeti YT, Shree S3, Sita ST, Summit RM); airline flows through `yatra_selected_flight` → eticket "Operated by" (done 2026-09-14)
+- [x] 6. ~~Implement pagination~~ → N/A as built (4–6 flights per day, date strip browses days)
+- [x] 7. Implement select flight → saves `yatra_selected_flight` to sessionStorage → passengerDetails (booking.html)
+- [x] 8. ~~Build passenger-details.html~~ → built as booking.html
+- [x] 9. ~~Build `booking.js`~~ → assets/js/booking.js
+- [x] 10. Build payment.html
+- [x] 11. Build `payment.js` (assets/js/payment.js)
+- [x] 12. ~~Build e-ticket.html~~ → built as eticket.html
+- [x] 13. ~~Build `ticket.js`~~ → assets/js/eticket.js
 - [ ] 14. Build my-bookings.html
 - [ ] 15. Build/rework admin.html
 - [ ] 16. Complete mock API architecture (`config.js`, `mock-data.js`, `api.js`, `validation.js`, `auth.js`, `flights.js`, `booking.js`, `payment.js`, `ticket.js`)
@@ -76,17 +96,139 @@
 
 ### Open decisions / notes for next sessions
 
-- The spec's **first task** is `flightListing.html`. The author also has their own
-  WIP files (`searchFlight.html/css/js`, currently failing syntax check with an
-  `FDB: ...` placeholder). **Decision needed when work starts:** build
-  `flightListing.html` fresh per spec, or finish and rename the author's
-  `searchFlight.*` WIP. Do not touch those files until the author says so.
+- **Scope (confirmed by the author, 2026-09-14):** Yatra is a booking platform
+  for browsing flights of Nepali airlines — Buddha Air, Yeti Airlines, etc. —
+  and is **domestic-only for now** (international may come later). Keep mock
+  data, airport codes, schedules, and airline names Nepali-domestic; this also
+  aligns with the spec's §33 mock route list (KTM↔PKR, BIR, BHR, BWA, KEP…).
+- **Dynamic-readiness (author instruction, 2026-09-14):** the frontend is static
+  for now but MUST become dynamic when the Java backend starts, with minimal
+  changes (spec §2/§41). Practical consequences for every page going forward:
+  - all data flows through `api.js` (`apiGet`/`apiPost`) with the
+    `USE_MOCK_DATA` / `API_BASE_URL` switch from `config.js` — never call
+    `fetch` or branch on mock/real inside page JS (spec Rule 7);
+  - mock responses must match the §36 API contract exactly so the Spring API can
+    return the same shapes later;
+  - sessionStorage keys (`flightSearchData`, `yatra_selected_flight`,
+    `bookingData`, `paymentData`, `yatra_transaction`) mirror future API
+    resources; a pending `bookingId` gets created in the mock layer per §31.2
+    and passed by key — never invent new one-off keys;
+  - no hardcoded flights/prices/passenger data in page JS — that belongs in
+    `mock-data.js` so the same render functions consume API responses later
+    (currently violated by `booking.js`'s hardcoded flight block);
+  - pages render from data, not from markup assumptions, so a swapped data
+    source can't break them.
+- **Resolved (2026-09-14):** the flight-listing decision is settled — the author's
+  `searchFlight.html` IS the flight listing. The only protected file left is
+  `admin.html`. `flightListing.html` will never be created.
+- **Resolved (2026-09-14, later in the day):** the full booking-wizard chain is
+  now linked end-to-end: homeLogged search → `searchFlight.html?from=&to=&date=&pax=`
+  → Select Departure Flight → `booking.html` → Continue → `payment.html` →
+  (eSewa only) → `esewaLogin.html` → `esewaOtp.html` → `esewaBalance.html` →
+  `esewaConfirm.html` → PAY (wallet or bank) → `eticket.html`. Card/bank/Khalti
+  options on payment.html are intentionally blocked with an alert until their
+  gateways are built (author decision: eSewa only for now).
+- Remaining booking-flow gaps (still open):
+  - booking.html's terms link points to `terms.html` (not created).
+  - Infants (INF) are counted in the search but render no form and pay nothing (lap infants) — real fare rules for infants are a future step. Passengers data also has no per-pax DOB/gender fields yet.
+  - `esewaOtpm.js` + `esewaOtpm.html` look like an older eSewa-OTP prototype
+    (fixed NPR 8299.99, next page `esewaPayment.html` which doesn't exist) — no
+    page references the JS; candidate for deletion if the author confirms.
 - Spec §23 mentions a future "Hotel/stay" nav item — current navbar does not
   have it. Treat spec as target state; reconcile only when the author asks.
 - Spec adds `--secondary: #f78383` to the palette (not currently used in CSS).
 
 ### Progress Log (newest first)
 
+- **2026-09-14 — Session 10:** Airline display added to searchFlight cards
+  (logo chip + name; 5 real Nepali carriers with correct IATA codes: Buddha U4,
+  Yeti YT, Shree S3, Sita ST, Summit RM; per-date carrier mix; flight numbers
+  match the operating carrier). Airline now flows through
+  `yatra_selected_flight` → e-ticket "Operated by …" and the eSewa login
+  flight-reference line. Real logo files fetched from Wikimedia/Wikipedia into
+  `assets/imgs/airline-*` with an automatic code-badge fallback when a logo is
+  missing/failed (fixed a lazy-loading bug that would have kept the fallback
+  showing forever). Full project read + §6 verification: 18/18 JS OK, 19/19 CSS
+  balanced, 0 missing assets, only terms.html still broken (pre-existing).
+  Trackers synced: eSewa gateway pages documented on their V2 redesign CSS
+  (esewaLoginV2.css / esewaV2.css); legacy gateway CSS (esewaOtp.css,
+  esewaLogin.css, esewaBalance.css, esewaConfirm.css) verified unreferenced by
+  any page — recorded as deletion candidates (kept as documented swap-back
+  path). Open gaps unchanged: booking.js hardcoded flight + 1 passenger form,
+  terms.html missing, esewaOtpm.js orphaned, my-bookings.html + mock API files
+  not started. **Continued (same session): booking.js wired to the wizard —**
+  renders N passenger forms (Adults + Children from `flightSearchData.passengers`,
+  fallback to `yatra_selected_flight.passengers`; infants = lap, no form/fare),
+  sidebar (route/time/date/pax/price/refund tag/breakdown) now comes from the
+  selected flight (total = per-pax price × paying travellers, deterministic
+  breakdown split), validation covers every passenger, `bookingData` saves the
+  real flight object (airline/class/refundable/per-pax price/totalPrice),
+  `bookingTimeLeft` is persisted so payment.html resumes the 15-min countdown.
+  booking.html's static Passenger-1 card replaced by `#passengerForms` render
+  target + sidebar IDs. Verified: node --check OK. Remaining gap: payment.html
+  booking-details card is still static mock data.
+- **2026-09-14 — Session 9:** eSewa gateway pages aligned with the site design
+  system while keeping their intentional mock-gateway look: site font guaranteed
+  on all form controls (button/input/select/textarea inherit Plus Jakarta
+  Sans), neutral text/radius/transition tokens aliased from homeLogged.css in
+  esewaOtp.css + esewaLogin.css (gateway `--esw-*` palette untouched). Also
+  fixed a real regression: esewaBalance/esewaConfirm had lost the gateway
+  chrome styles (top bar, card panel, buttons) when esewaPayment.css was
+  dropped in Session 6 — both pages now link esewaOtp.css + esewaLogin.css
+  before their own CSS. Also restored booking.html's right-hand Booking
+  Details sidebar (base `.booking-grid` columns rule was lost in the Session 7
+  dedup). Tracker accuracy: stale esewaOtpm.html file-map row
+  removed (page doesn't exist; only orphan esewaOtpm.js). Verified: 18/18 JS
+  OK, 17/17 CSS balanced, no missing assets; terms.html still the only broken
+  link.
+- **2026-09-14 — Session 8:** Design-consistency sweep (author flagged a
+  different back-to-top button vs homeLogged). Audit showed palette, font and
+  animations already unified site-wide; fixed the real drift: back-to-top icon
+  unified to `fa-plane-up` on all 15 pages (was 3 variants: arrow-up on
+  booking/payment, plane on searchFlight/eticket); Font Awesome CDN unified to
+  6.7.2 everywhere (booking/payment/esewaOtp were on 6.5.1); scoped
+  light-background fix for searchFlight `.btn-modify` (shared transparent
+  `.btn-outline` was white-on-light). Verified: CSS balanced, no missing
+  assets, only terms.html link still broken (pre-existing).
+- **2026-09-14 — Session 7:** Wizard design unification completed (continuation
+  of TODO-wizard-unification.md): all four booking-wizard pages
+  (searchFlight/booking/payment/eticket) now run on the shared homeLogged.css
+  system — dark `.wizard-band` + stepper, 15-min timer pill, slim ©-only
+  `.wizard-footer`, 11-link icon mobile menus, back-to-top. Page CSS stripped of
+  duplicated tokens/navbar/menu/buttons/reveal/stepper/footer/reduced-motion
+  blocks (eticket.css 815 → 424 lines, payment.css 583 → 550); eticket keeps a
+  scoped light-background `.et-actions .btn-outline` override; base img/a/ul/h
+  rules kept page-side. Fixed broken booking.html logo
+  (`yatra-logo-white.png` → `Yatra-logo-all-white.png`). Back-to-top JS wired in
+  searchFlight.js + eticket.js. Verified: 18/18 JS `node --check` OK, 17/17 CSS
+  brace-balanced, no missing assets; only broken link left is terms.html
+  (pre-existing). esewa* gateway pages intentionally left self-styled.
+- **2026-09-14 — Session 6:** Linked the whole booking-wizard chain (the
+  author's main scope): homeLogged search now redirects to
+  `./searchFlight.html?from=&to=&date=&pax=` (homeLogged.js); Select Departure
+  Flight → `./booking.html` (searchFlight.js); booking continue → payment.html
+  (already worked) and booking.js now also writes `yatra_passenger`; payment.js
+  routes eSewa → `./esewaLogin.html` and blocks other methods with an alert
+  (author decision: eSewa only for now); esewaLogin.js creates
+  `yatra_pending_payment` and goes to esewaOtp (no txn until final pay);
+  esewaBalance.js was written from scratch (amounts, user details, mock balance
+  26.35, promos YATRA10/YATRA500, CONTINUE → esewaConfirm, CANCEL → search);
+  esewaOtp → esewaBalance and esewaConfirm PAY → eticket already worked. Removed
+  dead `esewaPayment.css` links from esewaBalance.html/esewaConfirm.html (base
+  tokens come from esewaOtp.css). Verified: 18/18 JS `node --check` OK, CSS
+  balanced, no missing assets; only broken link left is terms.html.
+- **2026-09-14 — Session 5:** Tracker-sync only, no code changed. The author
+  also confirmed the product scope: domestic-only flights on Nepali airlines
+  (Buddha Air, Yeti Airlines, …); saved to both tracker files. The author
+  built the whole booking wizard themselves: searchFlight.html (listing),
+  booking.html (passenger details), payment.html, eticket.html, plus a 4-page
+  mock eSewa gateway (login/captcha → OTP → balance → confirm). All 18 JS files
+  pass `node --check`; all 17 CSS files brace-balanced. Checklist items 1–13
+  marked complete (6 = N/A as built); flightListing restriction removed — the
+  only protected file is now admin.html. Known gaps recorded in Open decisions:
+  homeLogged→searchFlight redirect, passengerDetails.html vs booking.html
+  handoff, missing terms.html, hardcoded flight in booking.js, missing
+  esewaPayment.css, esewaBalance.js empty.
 - **2026-09-13 — Session 4:** Saved the author's full project specification as
   this `requirements.md` (master spec + progress tracker). A temporary
   `work-completed.txt` summary was created the same session and later merged
@@ -109,7 +251,7 @@
 ## 1. PROJECT OVERVIEW
 
 I am developing a university academic project called **Yatra 2.0**, a Nepali
-airline booking platform. The project follows a strict **frontend-first,
+flight booking platform. The project follows a strict **frontend-first,
 multi-phase development approach**.
 
 ### Technology stack
@@ -1634,4 +1776,4 @@ END OF REQUIREMENTS
 
 *Tracker maintained by the author + agent. Update the Progress Tracker at the
 top of this file after every completed task; append session details to
-`project.md` (§7 Session Log).*
+`project.md` (§7 Session Log). Last updated: Session 10 — 2026-09-14.*

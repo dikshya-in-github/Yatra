@@ -1,0 +1,111 @@
+/* =====================================================
+   ESEWA STEP 2 — balance, user details, promo
+   Tokens + gateway chrome: esewaOtp.css + esewaLogin.css
+   (linked before this file). Page styles only.
+   ===================================================== */
+
+/* ---------- Balance card ---------- */
+.balance-card {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    background: rgba(255, 255, 255, 0.04);
+    border-radius: 12px;
+    padding: 1.1rem 1.25rem;
+    margin-bottom: 1.75rem;
+}
+.bal-refresh {
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    border: none;
+    background: transparent;
+    color: var(--esw-text);
+    font-size: 1.15rem;
+    cursor: pointer;
+    transition: var(--transition);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.bal-refresh:hover { color: var(--esw-green); transform: rotate(90deg); }
+.bal-refresh.spinning i {
+    animation: balSpin 0.7s linear infinite;
+}
+@keyframes balSpin { to { transform: rotate(360deg); } }
+.bal-label {
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    color: var(--esw-muted);
+}
+.bal-amount { font-size: 1.3rem; font-weight: 800; }
+.bal-amount .npr { color: var(--esw-green); }
+.bal-amount.updated { animation: balPulse 0.6s ease; }
+@keyframes balPulse {
+    0% { transform: scale(1); }
+    40% { transform: scale(1.08); color: var(--esw-green); }
+    100% { transform: scale(1); }
+}
+
+/* ---------- User details card ---------- */
+.ud-card {
+    position: relative;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(111, 206, 85, 0.25);
+    border-radius: 12px;
+    padding: 1.75rem 1.5rem 1.5rem;
+    margin-bottom: 1.75rem;
+}
+.ud-card h3 { font-size: 1.2rem; font-weight: 700; margin-bottom: 1.25rem; }
+.ud-phone { color: var(--esw-green); font-weight: 800; font-size: 1.1rem; }
+.ud-name { font-weight: 700; font-size: 1rem; margin-bottom: 1.1rem; }
+.ud-line {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.7rem;
+    font-size: 0.92rem;
+    margin-bottom: 0.85rem;
+    line-height: 1.5;
+}
+.ud-line i { color: var(--esw-green); margin-top: 0.2rem; width: 16px; text-align: center; }
+.ud-edit {
+    position: absolute;
+    top: 1.5rem;
+    right: 1.4rem;
+    color: var(--esw-muted);
+    cursor: pointer;
+    transition: var(--transition);
+}
+.ud-edit:hover { color: var(--esw-text); }
+
+/* ---------- Promo ---------- */
+.promo-field input {
+    width: 100%;
+    font-family: inherit;
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--esw-text);
+    background: transparent;
+    border: 1px solid rgba(111, 206, 85, 0.4);
+    border-radius: 8px;
+    padding: 0.95rem 1.1rem;
+    outline: none;
+    transition: var(--transition);
+}
+.promo-field input::placeholder { color: var(--esw-muted); }
+.promo-field input:focus { border-color: var(--esw-green); }
+.promo-ok { color: var(--esw-green); font-size: 0.82rem; font-weight: 700; margin: 0.4rem 0 0 0.2rem; }
+
+/* ---------- Left-panel extra rows ---------- */
+.row-promo .promo-val { color: var(--esw-green); }
+.row-payable { border-top: 1px solid rgba(111, 206, 85, 0.3); }
+
+/* ---------- CTA ---------- */
+.continue-btn { margin-top: 1.5rem; }
+.continue-btn:hover { transform: translateY(-2px); }
+
+/* ---------- Responsive ---------- */
+@media (max-width: 900px) {
+    .ud-card { padding: 1.5rem 1.25rem 1.25rem; }
+}

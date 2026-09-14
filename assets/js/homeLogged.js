@@ -243,7 +243,17 @@ document.addEventListener('DOMContentLoaded', () => {
                 searchBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Searching...';
                 searchBtn.disabled = true;
             }
-            setTimeout(() => { window.location.href = './flightListing.html'; }, 800);
+            setTimeout(() => {
+                // Redirect to the flight listing (searchFlight.html) with URL params it reads:
+                // ?from=&to=&date=&pax= (searchFlight.js parses these on load).
+                const params = new URLSearchParams();
+                if (searchData.origin) params.set('from', searchData.origin);
+                if (searchData.destination) params.set('to', searchData.destination);
+                if (searchData.departureDate) params.set('date', searchData.departureDate);
+                const totalPax = (searchData.passengers?.adult || 0) + (searchData.passengers?.child || 0);
+                params.set('pax', String(totalPax || 1));
+                window.location.href = './searchFlight.html?' + params.toString();
+            }, 800);
         });
     }
 
