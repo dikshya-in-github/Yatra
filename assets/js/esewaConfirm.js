@@ -93,6 +93,77 @@ document.addEventListener("DOMContentLoaded", function () {
                 ref: flight || null
             };
             sessionStorage.setItem("yatra_transaction", JSON.stringify(txn));
+
+            /* ---------- Persist the completed booking (Master Plan §2.1 #5) ----------
+               Durable record for the admin panel (localStorage survives closing
+               the tab, unlike sessionStorage). Data comes from booking.js's
+               `bookingData`; the flight reference is the live eSewa txn.
+               Same record the Spring API's POST /api/bookings will create
+               later — same keys, same shapes. */
+            try {
+                var bk = load("bookingData") || {};
+                var f = txn.ref || {};
+                var contact = bk.contact || {};
+                var paxList = bk.passengers || [];
+                var adminFlights = JSON.parse(localStorage.getItem("yatra_admin_flights") || "[]");
+                var match = null;
+                for (var i = 0; i < adminFlights.length; i++) {
+                    var af = adminFlights[i];
+                    if (af && af.no === (f.flightNo || "") && af.from === (f.from || "") && af.to === (f.to || "")) {
+                        match = af;
+                        break;
+                    }
+                }
+                if (match && typeof match.bookedSeats === "number") {
+                    var paying = bk.flight && bk.flight.passengerCount ? bk.flight.passengerCount : 1;
+                    match.bookedSeats = Math.min(match.seats, match.bookedSeats + paying);
+                    localStorage.setItem("yatra_admin_flights", JSON.stringify(adminFlights));
+                }
+                /* Same deterministic PNR/ticket derivation eticket.js uses,
+                   so the admin record matches the printed e-ticket. */
+                var seed = txn.txnId.replace(/\D/g, "") || "00000000";
+                var pnrVal = "YTRA" + seed.slice(0, 2).split("").map(function (c) {
+                    return String.fromCharCode(65 + (+c) % 26);
+                }).join("") + seed.slice(2, 4);
+                var bookingRecord = {
+                    id: "BKG" + Date.now().toString().slice(-8),
+                    pnr: pnrVal,
+                    ticketNo: "784-24" + seed.slice(0, 10),
+                    status: "Confirmed",
+                    paymentStatus: "Paid",
+                    customer: contact.firstName
+                        ? (contact.firstName + " " + (contact.lastName || "")).trim()
+                        : (user.name || ""),
+                    email: contact.email || user.email || "",
+                    phone: contact.phone || user.phone || "",
+                    passengers: paxList,
+                    flight: {
+                        flightNo: f.flightNo || "",
+                        airline: f.airline || null,
+                        from: f.from || "",
+                        to: f.to || "",
+                        date: f.date || "",
+                        depart: f.depart || "",
+                        arrive: f.arrive || "",
+                        flightClass: f.flightClass || "E Class",
+                        refundable: !!f.refundable,
+                        pricePerPassenger: bk.flight ? bk.flight.pricePerPassenger : null,
+                        passengerCount: bk.flight ? bk.flight.passengerCount : 1
+                    },
+                    amount: txn.amount,
+                    productAmount: txn.productAmount,
+                    payment: {
+                        method: txn.method,
+                        txnId: txn.txnId,
+                        paidAt: txn.paidAt
+                    },
+                    createdAt: new Date().toISOString()
+                };
+                var allBookings = JSON.parse(localStorage.getItem("yatra_bookings") || "[]");
+                allBookings.unshift(bookingRecord);
+                localStorage.setItem("yatra_bookings", JSON.stringify(allBookings));
+            } catch (e) { /* demo store failure must never block the e-ticket */ }
+
             location.href = "./eticket.html"; // success / e-ticket page
         }, 1300);
     });

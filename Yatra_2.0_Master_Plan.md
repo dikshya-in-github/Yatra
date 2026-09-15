@@ -79,7 +79,8 @@ Do **not** redesign these completed pages unnecessarily. They use a shared dark 
 - ⏳ **Backend**: eSewa payment integration still to be implemented server-side — this needs its own service (`PaymentService`) and will connect to the `Payment` entity/`admin-payments.html` monitoring view. Treat this as a distinct backend task, not something automatically covered by the frontend mock (see Part 3, item 6).
 
 ### Airlines Represented
-Buddha Air (U4) · Yeti Airlines (YT) · Shree Airlines (S3) · Sita Air (ST) · Summit Air (RM)
+Buddha Air (U4) · Yeti Airlines (YT) · Shree Airlines (S3) · Sita Air (ST)
+*(roster trimmed from 5 to 4 on 2026-09-15 — Summit Air RM removed)*
 — eventually driven by database/API data rather than hardcoded in the frontend.
 
 ### Core Business Rule: Automatic Seat Calculation

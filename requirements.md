@@ -14,7 +14,7 @@
 > Never mark something complete that has not actually been built and verified.
 
 - **Saved:** 2026-09-13 (Session 4) — from the author's complete project specification
-- **Last progress update:** 2026-09-14 (Session 11)
+- **Last progress update:** 2026-09-15 (Session 22)
 - **Note (2026-09-14):** `project.md` (session log + frontend conventions) was
   merged into this file as §46–52 and deleted — this is now the ONLY tracker
   to read/update. Companion planning docs (read-only, do not modify here):
@@ -29,7 +29,7 @@
 
 | Phase | Scope | Status |
 |---|---|---|
-| Phase 1 — Frontend | HTML/CSS/vanilla JS, mock data | **IN PROGRESS (~75%)** |
+| Phase 1 — Frontend | HTML/CSS/vanilla JS, mock data | **IN PROGRESS (~80%)** |
 | Phase 2 — Backend | Java + Spring MVC + Hibernate + MySQL (N-tier) | NOT STARTED (blocked until frontend booking workflow is stable) |
 | Phase 3 — Integration | Connect frontend to live Spring API, CORS, Postman | NOT STARTED |
 
@@ -61,6 +61,7 @@
 - [x] searchFlight.html/css/js — flight listing (author-built; date strip, fare classes, policy modal, select → booking.html)
 - [x] booking.html/css/js — passenger details (contact + passenger forms, validation, SSR toggle, 15-min timer)
 - [x] payment.html/css/js — payment method (card/bank options + eSewa, promo field, timer resumes from sessionStorage)
+- [x] my-bookings.html/css/js — customer booking history over `yatra_bookings` (shared with admin): hero stats (total/upcoming/spent), All/Upcoming/Completed/Cancelled filter chips, trip cards, detail modal mirroring eticket data, **View e-ticket → writes `yatra_transaction` from the stored booking and jumps to eticket.html**; "My Bookings" nav/mobile-menu/footer links added to all 10 content pages (wizard band pages unchanged — author call later)
 - [x] eticket.html/css/js — e-ticket (route/PNR/ticket no., fare breakdown, barcodes, print)
 - [x] eSewa gateway mock: esewaLogin → esewaOtp → esewaBalance → esewaConfirm (captcha, OTP, wallet balance, txn saved)
 - [ ] admin.html — ❌ intentionally unfinished (raw JSP placeholder, rework later)
@@ -86,7 +87,7 @@ eticket.html not e-ticket.html) — treat the built pages as the reference.
 - [x] 3. ~~Build `flights.js`~~ → logic lives in searchFlight.js
 - [x] 4. Connect homeLogged search → flight listing *(redirect fixed 2026-09-14: homeLogged.js now maps `flightSearchData` to `./searchFlight.html?from=&to=&date=&pax=`)*
 - [x] 5. Implement filtering → date strip (±3 days) + fare-class pills + price/refund live updates
-- [x] 5b. Show airline on flight cards (logo images from Wikimedia in `assets/imgs/airline-*` with IATA-code-badge fallback, 5 real Nepali carriers: Buddha U4, Yeti YT, Shree S3, Sita ST, Summit RM); airline flows through `yatra_selected_flight` → eticket "Operated by" (done 2026-09-14)
+- [x] 5b. Show airline on flight cards (logo images from Wikimedia in `assets/imgs/airline-*` with IATA-code-badge fallback, 4 real Nepali carriers: Buddha U4, Yeti YT, Shree S3, Sita ST — Summit RM removed 2026-09-15); airline flows through `yatra_selected_flight` → eticket "Operated by" (done 2026-09-14)
 - [x] 6. ~~Implement pagination~~ → N/A as built (4–6 flights per day, date strip browses days)
 - [x] 7. Implement select flight → saves `yatra_selected_flight` to sessionStorage → passengerDetails (booking.html)
 - [x] 8. ~~Build passenger-details.html~~ → built as booking.html
@@ -95,7 +96,7 @@ eticket.html not e-ticket.html) — treat the built pages as the reference.
 - [x] 11. Build `payment.js` (assets/js/payment.js)
 - [x] 12. ~~Build e-ticket.html~~ → built as eticket.html
 - [x] 13. ~~Build `ticket.js`~~ → assets/js/eticket.js
-- [ ] 14. Build my-bookings.html
+- [x] 14. Build my-bookings.html *(built 2026-09-15 — customer booking history over `yatra_bookings`)*
 - [ ] 15. Build/rework admin.html
 - [ ] 16. Complete mock API architecture (`config.js`, `mock-data.js`, `api.js`, `validation.js`, `auth.js`, `flights.js`, `booking.js`, `payment.js`, `ticket.js`)
 - [ ] 17. Test entire frontend
@@ -103,6 +104,13 @@ eticket.html not e-ticket.html) — treat the built pages as the reference.
 
 ### Open decisions / notes for next sessions
 
+- **Deferred by the author (2026-09-15):** the following are intentionally
+  postponed — do NOT pick these up unprompted: `admin-profile.html` (last
+  §2.1 admin page), a customer/user profile page, real (non-mock)
+  `ticketStatus.html` functionality, the homeLogged **Group Booking** tab,
+  and the **Flight Status** tab. Focus is shifting to the backend (Phase 2);
+  the item-16 mock-API refactor + item-17 test pass still happen before
+  Phase 3 integration, not before backend code starts.
 - **Scope (confirmed by the author, 2026-09-14):** Yatra is a booking platform
   for browsing flights of Nepali airlines — Buddha Air, Yeti Airlines, etc. —
   and is **domestic-only for now** (international may come later). Keep mock
@@ -147,6 +155,211 @@ eticket.html not e-ticket.html) — treat the built pages as the reference.
 
 ### Progress Log (newest first)
 
+- **2026-09-15 — Session 22:** **`my-bookings.html` built — customer booking
+  history (checklist item 14 ✅; Phase 1 → ~80%).** First customer-side page
+  over the shared `yatra_bookings` store — **what customers see here is
+  exactly what the admin sees in admin-bookings.html** (same store, same
+  seed flag; no seeding here — demo rows load from admin-bookings or a
+  real checkout). Runs the shared content shell (homeLogged.css + .js,
+  hero-sky, footer, back-to-top) with page-only `myBookings.css`: hero
+  stats (Total / Upcoming / Total spent — real numbers), filter chips
+  (All / Upcoming / Completed / Cancelled — **buckets derived from status
+  + departure date**, never stored), trip cards (PNR + booking id, route
+  + flight + airline, amount + method, status + payment badges), slim
+  pagination (6/page), **detail modal mirroring the e-ticket data**
+  (booking/flight/contact/payment blocks + passenger table) and a
+  **View e-ticket handoff**: writes the chosen booking into
+  `yatra_transaction` (exact shape eticket.js reads) then jumps to
+  eticket.html — the printed ticket matches the stored record, fully
+  offline. **"My Bookings" links added to the navbar, mobile menu and
+  footer Support column of all 10 content pages** (wizard-band pages
+  deliberately untouched — author's call later). No customer-cancel here:
+  cancellation stays with admin-bookings (single owner). Verified: all JS
+  node --check OK, all CSS brace-balanced, link/asset sweeps clean
+  (terms.html remains the only pre-existing broken link), ID cross-check
+  clean.
+- **2026-09-15 — Session 21:** **`admin-destinations.html` built — destination
+  CRUD (Master Plan §2.1 #7); the Manage section of the sidebar is now fully
+  live** (only Profile still carries a "soon" chip). New localStorage store
+  `yatra_admin_destinations` self-seeds with the **exact 11-airport set from
+  searchFlight.js's CITY map** (KTM PKR BWA BDP BIR BHR JKR SIM DHI KEP TMI)
+  with real airport names and the on-disk images (Bhadrapur/Janakpur/Simara/
+  Dhangadhi/Tumlingtar intentionally seed with no image → exercises the
+  code-badge fallback, like Summit Air did for airlines). Toolbar (search
+  city/airport/code + status filter), paginated table (image chip w/
+  fallback, city, airport, code badge, description, status), add/edit modal
+  (unique city, **airport code must match the 11-code CITY map** — a made-up
+  code would silently break storefront search — unique 3-letter, airport
+  name, description, **image URL field labelled "Cloudinary secure_url"** +
+  2 MB demo upload → data URL, §3.5 hybrid split mirrored admin-side:
+  destinations store URLs vs airlines' Base64/BLOB), styled confirm modal
+  for deletes. **Route-protection rule:** deleting an airport that flights
+  in `yatra_admin_flights` still reference is blocked with an error
+  pointing at Disable — routes never dangle. Destinations sidebar link
+  activated on all 8 admin pages. Verified: node --check OK, ID cross-check
+  clean, seed image files all on disk.
+- **2026-09-15 — Session 20:** **`admin-tickets.html` built — e-ticket
+  search/view (Master Plan §2.1 #9)** on the shared admin shell. Like
+  Payments, **no new store**: tickets are derived from `yatra_bookings`
+  (each booking's `pnr` + `ticketNo` = the document eticket.html printed;
+  `passengers` = the ticket set). **READ-ONLY by design** (Master Plan Part
+  5: admin *views* e-tickets — issuing/reissuing/voiding belongs to the
+  backend's TicketService): toolbar (search PNR/ticket no/passenger/flight
+  no/booking ID + Issued/Voided filter), paginated table (ticket no + PNR,
+  lead passenger + "N more on this set", flight, route + departure,
+  booking ref, payment badge, amount, Issued/Voided status badge), **detail
+  modal mirroring the customer's e-ticket** (ticket/flight/customer/payment
+  blocks + passenger table — same data blocks as admin-bookings' detail).
+  A booking cancelled in admin-bookings shows here as Voided automatically
+  (same store). Empty state points at admin-bookings.html. Tickets sidebar
+  link activated on all 7 admin pages ("soon" chips removed). Verified:
+  node --check OK, ID cross-check clean, internal links OK.
+- **2026-09-15 — Session 19:** **`admin-users.html` built — user management
+  CRUD (Master Plan §2.1 #6)** on the shared admin shell; **the dashboard's
+  Total Users stat is no longer a demo value.** New localStorage store
+  `yatra_admin_users` self-seeds on first open with 10 users (seed admin
+  id 1 mirrors the `yatra_admin_session` shape written by admin-login.html:
+  `admin@yatra.com`, role ADMIN; 9 customers reusing the bookings-seed
+  names so users↔bookings line up in the demo). Toolbar (search
+  name/email/phone/ID + role + status filters), paginated table (avatar +
+  name/email user cell — new `.user-cell` CSS helper, phone, role badge,
+  registered date, status badge), add/edit modal (name, unique valid email,
+  optional Nepali-mobile phone `9[678]XXXXXXXX`, role, status; **no
+  password field — passwords belong to the backend's BCrypt**), styled
+  confirm modal for deletes. **Admin accounts are protected:** the edit
+  form keeps them Active and the row shows a lock instead of
+  Disable/Delete (a disabled admin could lock the panel — RBAC moves to
+  the backend later). Deleting a user keeps their bookings (records
+  snapshot the customer name, not the account). `admin-dashboard.js`
+  rewired: Total Users reads the store (seed-size 10 fallback while empty,
+  matching the airlines/flights rule) with an explanatory tooltip.
+  Users sidebar link activated on all 6 admin pages ("soon" chips
+  removed). Verified: node --check OK (users + dashboard), CSS 162/162
+  balanced, ID cross-check clean.
+- **2026-09-15 — Session 18:** **`admin-payments.html` built — eSewa payment
+  monitoring (Master Plan §2.1 #8 / §3.6)** on the shared admin shell: no new
+  store — transactions are **derived from `yatra_bookings`** (each booking's
+  `payment` object = one txn; booking id shown as fallback when a record has
+  no txn id), so storefront checkouts land here automatically. 4 summary stat
+  cards (Transactions / Collected / Refunded / Pending — real numbers),
+  toolbar (search txn/booking/PNR/customer/flight no + method & status
+  filters), paginated table (txn id + paid-at, customer, booking PNR+ID,
+  method, date, amount, status badges — same badge semantics as
+  bookings/dashboard), **detail modal** (transaction / booking / flight /
+  customer blocks, refund timestamp shown when refunded) and a **Refund =
+  status change** action (Paid → Refunded, writes `payment.refundedAt`;
+  amounts/txn IDs never editable — that's the future backend
+  PaymentService's job; seats stay counted). Empty state points at
+  admin-bookings.html for demo data (no separate seed here — one source of
+  truth). New tiny CSS helper `.empty-state .empty-hint`. Payments sidebar
+  link activated on all 5 admin pages ("soon" chips removed). Verified:
+  node --check OK, CSS 158/158 balanced, ID cross-check clean.
+- **2026-09-15 — Session 17:** **Dashboard rewired to the real stores** —
+  stat cards + Recent Bookings are no longer dummy numbers.
+  `assets/js/admin-dashboard.js` (new): reads `yatra_admin_airlines`,
+  `yatra_admin_flights` and `yatra_bookings` and fills all 7 §2.5 cards —
+  Total Flights/Airlines = store sizes (seed-size fallbacks 6/4 only while a
+  store is empty, with an explanatory tooltip), Total Bookings/Today's =
+  real counts (0 honest), Revenue = sum of non-cancelled booking amounts
+  (compact NPR Lakh/Crore format), Pending Payments = paymentStatus Pending
+  count, Total Users stays a flagged demo value until admin-users.html.
+  Recent Bookings table now renders LIVE rows from `yatra_bookings`
+  (newest first, PAGE_SIZE 5, mini pagination, empty state pointing at the
+  storefront) with the same badge semantics as admin-bookings.html; the
+  static demo rows were removed. "Add Flight" now routes to
+  admin-flights.html. When the Spring API lands these reads swap for
+  apiGet() calls. Tracker file-map row updated. Verified: node --check OK,
+  ID cross-check clean.
+- **2026-09-15 — Session 16:** **`admin-bookings.html` built + storefront↔admin
+  store connection** — the admin panel now shows real customer bookings.
+  `assets/js/esewaConfirm.js` (PAY success path) persists each completed
+  checkout to localStorage `yatra_bookings` (id, deterministic PNR + ticket
+  no. matching eticket.js's derivation, customer, passengers, flight ref,
+  amounts, payment) and increments `bookedSeats` on the matching
+  `yatra_admin_flights` row — **the seat-capacity rule now derives from real
+  bookings**; failures are wrapped in try/catch so the demo e-ticket never
+  breaks. `admin-bookings.html/js` (Master Plan §2.1 #5): read-mostly table
+  (search PNR/ID/customer/flight no + booking & payment status filters),
+  **cancel = status change** via a new styled confirm modal (seats stay
+  counted; refund is left to the future payments flow; live bookings have no
+  delete button), detail modal mirroring the e-ticket data (4 detail blocks +
+  passenger table), Reset-demo button (seeds merged in exactly once via
+  `yatra_bookings_seeded_v1` so live records are never overwritten; only
+  `_seed` rows are deletable). `admin.css` gained `.a-btn-danger`,
+  `.modal-sm/.modal-wide`, `.detail-grid/.detail-block`, `.pax-heading`,
+  `.confirm-msg`. Bookings link activated on all admin pages. Verified:
+  node --check OK, CSS balanced, ID cross-check clean.
+- **2026-09-15 — Session 15:** **`admin-flights.html` built — flight schedule
+  CRUD (Master Plan §2.1 #4)** on the shared admin shell: toolbar (live search
+  by flight no/route/airline + airline filter + status filter), paginated
+  table (PAGE_SIZE 8; route cell shows codes + city names, seats cell shows
+  **Available = capacity − booked** with the booked count as sub-text and a
+  red zero when sold out), add/edit modal. **Airline dropdown is fed from the
+  airlines store (`yatra_admin_airlines`, read-only here with a 4-carrier
+  fallback if empty)** — flights reference `airlineId`, never free text;
+  inactive airlines stay selectable-with-suffix so edits never lose their
+  stored value; picking an airline pre-fills its IATA code in an empty flight
+  no. **Seat-capacity-only rule enforced:** the ONLY seat input is Seat
+  Capacity (1–999 whole number); there is no available-seats field — the
+  modal explains the backend rule inline and `bookedSeats` is system data
+  preserved on edit (0 for new flights). Validation: unique flight no in
+  `XXX 000` format, airline required (with a helpful error when the store is
+  empty), from ≠ to, arrival after departure (same-day domestic), fare > 0.
+  Route/airport dropdowns mirror searchFlight.js's 11-airport CITY map.
+  Seed: 6 flights across all 4 carriers on KTM↔PKR/BIR/KEP/BWA routes with
+  realistic aircraft (ATR 42/72, CRJ 700, Dornier 228). localStorage
+  `yatra_admin_flights`; CRUD layer swaps for api.js in the item-16
+  refactor. `admin.css` grew small shared helpers (`.cell-sub`, `.al-cell`,
+  `.seat-out`, `.form-hint.rule`). Flights sidebar link activated on all
+  three existing admin pages. Verified: node --check OK, CSS balanced,
+  no broken refs.
+- **2026-09-15 — Session 14:** Airline roster trimmed to 4 carriers (author
+  removed Summit Air RM). `searchFlight.js` flight data and the page logos
+  were already correct (4 carriers; logo files = buddha .jpg, yeti .jpg,
+  shree .svg, sita .jpeg; no reference to the deleted `airline-yeti.png`) —
+  the stale spots were the admin seed, dashboard stat and docs.
+  `admin-airlines.js` seed now lists the 4 real Nepali carriers (Buddha U4,
+  Yeti YT, Shree S3, Sita ST) plus a localStorage migration in `load()` that
+  drops any previously-stored Summit Air (IATA RM) row so old
+  `yatra_admin_airlines` data self-heals without a manual storage clear.
+  `admin-dashboard.html`: Total Airlines stat 5 → 4; sidebar Airlines link
+  activated (the "soon" chip Session 13 left behind on this page).
+  Master Plan §Airlines Represented + tracker references updated. Verified:
+  node --check OK.
+- **2026-09-14 — Session 13:** `admin-login.html` brand badge replaced with the
+  real logo (`Yatra-logo-black.png`, 42px — black variant suits the white card;
+  matches navbar logo height). **`admin-airlines.html` built — the reference
+  CRUD page (Master Plan §2.1 #3):** toolbar (debounce-free live search by
+  name/IATA + status filter + result count), paginated table (PAGE_SIZE 5;
+  logo chip with IATA code-badge fallback — Summit Air intentionally has no
+  logo file and exercises it; status badges; Edit/Disable-Activate/Delete row
+  actions), add/edit modal (name unique, IATA 2-char + unique, status select,
+  description, **logo upload → base64 data-URL preview** mocking the future
+  DB BLOB/Base64 endpoint per §3.5, 2 MB demo cap, remove-logo), validation
+  w/ inline errors, toasts, empty state. Data = localStorage
+  `yatra_admin_airlines` seeded with the 5 real Nepali carriers (Buddha U4,
+  Yeti YT, Shree S3, Sita ST, Summit RM); CRUD layer swaps for api.js in the
+  item-16 refactor. `admin.css` grew the shared reusable components every
+  future CRUD page needs: toolbar/search/filter, form fields + form-grid,
+  upload preview, modal, logo-chip/row-actions/toast. Airlines sidebar link
+  activated (soon-chip removed). Verified: node --check OK (admin.js +
+  admin-airlines.js), CSS 138/138 balanced, no broken links/missing assets,
+  all 4 seed logo files on disk.
+- **2026-09-14 — Session 12:** **Admin phase started** (author pivot: admin
+  frontend first, backend after). Scaffolded the shared admin system per
+  Master Plan §2.1/§2.4: `assets/css/admin.css` (self-contained admin design
+  system — sidebar, topbar, cards, stat grid, data-table, badges, pagination;
+  admin pages intentionally do NOT load homeLogged.css), `assets/js/admin.js`
+  (mock session guard via `yatra_admin_session` sessionStorage key mirroring
+  the future JWT role check, sidebar user fill, active-link + topbar title,
+  mobile sidebar toggle, logout), `admin-login.html` (standalone dark login,
+  client-side validation, mock auth → dashboard), `admin-dashboard.html`
+  (shell + all 7 §2.5 stat cards with dummy numbers + recent-bookings demo
+  table showing the shared table/badge/pagination pattern). Sidebar marks
+  unbuilt pages with "soon" chips. Verified: node --check OK, CSS 93/93
+  balanced, no broken links/missing assets. Legacy `admin.html` untouched
+  (still protected). Next: remaining admin pages (airlines first as the
+  reference CRUD pattern), my-bookings.html (checklist item 14).
 - **2026-09-14 — Session 11:** Tracker consolidation — `project.md` (agent
   session log + frontend conventions) merged into this file as §46–52
   (Project Context, Conventions, File Map, Do-Not-Touch, Open Items,
@@ -1792,7 +2005,7 @@ END OF REQUIREMENTS
 
 *Tracker maintained by the author + agent. Update the Progress Tracker at the
 top of this file after every completed task and append session details to
-§52 Session Log. Last updated: Session 11 — 2026-09-14.*
+§52 Session Log. Last updated: Session 17 — 2026-09-15.*
 
 ---
 
@@ -1922,7 +2135,7 @@ refactor before Phase 2.
 | refundPolicy.html | refundPolicy.css | refundPolicy.js + homeLogged.js | FAQ accordion + fee estimator |
 | login.html | (inline) | (inline) | standalone |
 | signup.html | (inline) | (inline) | standalone |
-| searchFlight.html (flight listing — author-built) | homeLogged.css (shared) + searchFlight.css | searchFlight.js | URL params `?from=&to=&date=&pax=`; date strip ±3 days; 6 fare classes (E/C/D/B/A/Y); airline logo+name on cards (Buddha U4, Yeti YT, Shree S3, Sita ST, Summit RM — logos in `assets/imgs/airline-*`, code-badge fallback; flows in `yatra_selected_flight` → eticket "Operated by"); policy modal; select → saves `yatra_selected_flight` → booking.html; on shared wizard band + slim wizard-footer |
+| searchFlight.html (flight listing — author-built) | homeLogged.css (shared) + searchFlight.css | searchFlight.js | URL params `?from=&to=&date=&pax=`; date strip ±3 days; 6 fare classes (E/C/D/B/A/Y); airline logo+name on cards (Buddha U4, Yeti YT, Shree S3, Sita ST — roster trimmed 2026-09-15; logos in `assets/imgs/airline-*`, code-badge fallback; flows in `yatra_selected_flight` → eticket "Operated by"); policy modal; select → saves `yatra_selected_flight` → booking.html; on shared wizard band + slim wizard-footer |
 | booking.html (passenger details) | homeLogged.css (shared) + booking.css | booking.js | contact + passenger forms, validation, "I'm a passenger" auto-fill, SSR toggle, 15-min countdown → saves `bookingData` + `yatra_passenger` → payment.html; wizard band stepper + timer + wizard-footer from shared |
 | payment.html (payment method) | homeLogged.css (shared) + payment.css | payment.js | eSewa radio → esewaLogin.html; other methods blocked w/ alert (eSewa-only decision); promo field (cosmetic), timer resumes from `bookingTimeLeft` → saves `paymentData`; wizard band stepper + timer + wizard-footer from shared |
 | eticket.html (e-ticket) | homeLogged.css (shared) + eticket.css | eticket.js | reads `yatra_transaction` + `yatra_selected_flight`; PNR/ticket no., fare breakdown, fake barcodes, print; shared wizard band + wizard-footer |
@@ -1932,6 +2145,15 @@ refactor before Phase 2.
 | esewaConfirm.html (eSewa confirm) | esewaV2.css (V2 redesign) | esewaConfirm.js | wallet (insufficient at 26.35 → modal) / bank (always succeeds); deducts wallet on success, saves `yatra_transaction` → eticket.html |
 | — (no page) | esewaOtp.css, esewaLogin.css, esewaBalance.css, esewaConfirm.css | — | LEGACY gateway styles, superseded by the V2 redesign; NO page links them anymore (verified 2026-09-14) — deletion candidates once the author confirms they won't "swap back" |
 | — (no esewaOtpm.html) | — | esewaOtpm.js (orphan) | older eSewa OTP prototype script; no page references it; candidate for deletion if the author confirms |
+| admin-login.html (admin auth entry — Master Plan §2.1 #1) | (inline, standalone) | (inline) | dark standalone design (like login.html); mock auth writes `yatra_admin_session` → admin-dashboard.html; real JWT login later (§2.3) |
+| admin-dashboard.html (admin shell — Master Plan §2.1 #2) | admin.css (shared admin) + (inline none) | admin.js + admin-dashboard.js | sidebar (10 nav items, "soon" chips on unbuilt pages) + topbar + 7 §2.5 stat cards **wired to the mock stores** (airlines/flights store sizes with seed fallbacks, bookings counts, revenue = non-cancelled amounts, pending payments; users = `yatra_admin_users` store size with seed fallback 10) + Recent Bookings table rendering LIVE `yatra_bookings` rows (newest first, PAGE_SIZE 5, empty state); sidebar block gets copied into every future admin-*.html |
+| — (shared admin assets) | assets/css/admin.css | assets/js/admin.js | ADMIN design system (self-contained — admin pages do NOT load homeLogged.css): tokens, sidebar, topbar, cards/stat-grid, data-table, badges, pagination, toolbar/search/filter, form fields, upload preview, modal, row actions, toast; JS: session guard, user fill, active nav, sidebar toggle, logout |
+| admin-airlines.html (airline CRUD — Master Plan §2.1 #3, reference CRUD pattern) | admin.css (shared admin) | admin.js + admin-airlines.js | toolbar (search name/IATA + status filter) + paginated table (logo chip w/ IATA fallback, badges, Edit/Disable/Delete) + add/edit modal (name, IATA 2-char unique, status, description, logo upload → base64 preview, 2 MB demo cap); mock data in localStorage `yatra_admin_airlines` seeded with the 4 Nepali carriers (roster trimmed 2026-09-15 — Summit RM removed); swap CRUD layer for api.js later |
+| admin-bookings.html (booking management — Master Plan §2.1 #5) | admin.css (shared admin) | admin.js + admin-bookings.js | read-mostly: search (PNR/ID/customer/flight no) + booking/payment status filters + paginated table (PNR+ID, customer, flight, route+date, pax, amount, payment+method, status badges; View always, Cancel only when Confirmed, Delete only on `_seed` demo rows) + **detail modal mirroring eticket.js data** (booking/flight/contact/payment blocks + passenger table) + **styled confirm modal**; cancel = status change (Confirmed → Cancelled, payment flagged Refunded later by payments flow — **seats stay counted**); localStorage `yatra_bookings` written by esewaConfirm.js on PAY success (live records never overwritten; seed-once flag `yatra_bookings_seeded_v1`); swap CRUD layer for api.js later |
+| admin-flights.html (flight CRUD — Master Plan §2.1 #4) | admin.css (shared admin) | admin.js + admin-flights.js | toolbar (search flight no/route/airline + airline + status filters) + paginated table (route w/ city names, **Available = capacity − booked** display, red zero when sold out) + add/edit modal (unique flight no `XXX 000`, **airline dropdown fed from the `yatra_admin_airlines` store by id**, 11-airport route selects mirroring searchFlight.js, times, aircraft, fare, **Seat Capacity is the only seat input — no manual available-seats field** (teacher-flagged rule), status); mock data in localStorage `yatra_admin_flights` (6 seed flights, all 4 carriers); swap CRUD layer for api.js later |
+| admin-users.html (user management — Master Plan §2.1 #6) | admin.css (shared admin) | admin.js + admin-users.js | full CRUD on localStorage `yatra_admin_users` (self-seeds 10 users; seed admin mirrors the admin-login session shape); toolbar (search name/email/phone/ID + role + status filters) + paginated table (avatar+name/email cell `.user-cell`, role/status badges, registered date) + add/edit modal (unique email, optional Nepali-mobile phone, role, status — **no password field, backend BCrypt owns passwords**); **admin accounts protected** (editable, never disabled/deleted — RBAC moves to the backend); deleting a user keeps their bookings (records snapshot names); swap CRUD layer for `apiGet('/api/users')` later |
+| admin-tickets.html (e-ticket view — Master Plan §2.1 #9) | admin.css (shared admin) | admin.js + admin-tickets.js | **read-only**: tickets **derived from `yatra_bookings`** (booking's pnr + ticketNo = the e-ticket; no separate store); toolbar (search PNR/ticket no/passenger/flight no/booking ID + Issued/Voided filter) + paginated table (ticket no + PNR, lead pax + set size, flight, route + departure, payment badge, amount, Issued/Voided) + **detail modal mirroring eticket.html** (ticket/flight/customer/payment blocks + passenger table); Voided = booking Cancelled from admin-bookings (same store); no mutations — TicketService issues/voids via `apiGet('/api/tickets')` later |
+| admin-destinations.html (destination CRUD — Master Plan §2.1 #7) | admin.css (shared admin) | admin.js + admin-destinations.js | full CRUD on localStorage `yatra_admin_destinations` (self-seeds the **11 searchFlight CITY-map airports** w/ real airport names + on-disk images; 5 seed with no image → code-badge fallback); toolbar (search city/airport/code + status filter) + paginated table (image chip, city, airport, code, description, status) + add/edit modal (unique city, **code locked to the CITY map** — protects storefront search, unique 3-letter, airport name, description, **image URL = Cloudinary secure_url mock** + 2 MB demo upload → data URL, §3.5 hybrid split admin-side); **delete blocked while flights reference the code** (disable instead); swap CRUD layer for `apiGet('/api/destinations')` + CloudinaryService later | | admin.css (shared admin) | admin.js + admin-payments.js | read-mostly: transactions **derived from `yatra_bookings`** (each booking's `payment` object = one txn — no separate store; storefront PAY writes land here automatically); 4 summary stat cards (Transactions/Collected/Refunded/Pending, real numbers) + toolbar (search txn/booking/PNR/customer/flight no + method + status filters) + paginated table (txn id + paid-at, customer, booking PNR+ID, method, date, amount, status badges) + **detail modal** (transaction/booking/flight/customer blocks, refund timestamp) + **Refund = status change** (Paid → Refunded + `payment.refundedAt`; seats stay counted; amounts/txn IDs never editable — backend PaymentService's job later); swap store read for `apiGet('/api/payments')` later |
 
 **Assets:** `assets/imgs/` — airline logos added 2026-09-14 (from
 Wikimedia/Wikipedia, used by searchFlight cards): `airline-buddha.jpg`,
@@ -1950,7 +2172,10 @@ as placeholders; JS has a gradient fallback for broken images).
 - **`admin.html`** — user will work on this LATER. It is currently a raw Java
   JSP file (server-side scriptlets) and will look broken if opened directly.
   That is expected. **Do not modify, fix, or "clean up" it.** This is now the
-  ONLY protected file.
+  ONLY protected file. (Note, Session 12: the admin panel is being built as
+  its own `admin-*.html` pages per Master Plan §2.1 — `admin-login.html` and
+  `admin-dashboard.html` exist; `admin.html` stays a separate legacy file
+  until the author decides to rework or retire it.)
 - ~~`flightListing.html`~~ — restriction removed 2026-09-14: the user built
   the flight listing themselves as **`searchFlight.html`**. Never create
   `flightListing.html`.
@@ -2028,6 +2253,297 @@ tokens, navbar, and footer — never re-declare them.
 **Found but not fixed:** <issues discovered, deliberately left>
 **Next up:** <natural continuation points>
 ```
+
+### Session 22 — 2026-09-15
+**Requested:** "Build my-bookings.html so customers can see their booking
+history from yatra_bookings." (checklist item 14)
+**Done:**
+- `my-bookings.html` + `assets/css/myBookings.css` +
+  `assets/js/myBookings.js` (new): customer booking history over the
+  shared `yatra_bookings` store — see Progress Log entry above. Status
+  buckets derived (Cancelled / departure-date past / future), never
+  stored; View e-ticket handoff rebuilds `yatra_transaction` from the
+  stored booking (same keys as the storefront).
+- "My Bookings" nav link + mobile-menu link + footer Support link added
+  to all 10 content pages (homeLogged, destinations, ticketStatus, blog,
+  careers, press, helpCenter, contactUs, refundPolicy, aboutUs).
+- Tracker: checklist item 14 ticked, Phase 1 ~75% → ~80%, completed-pages
+  entry, file-map rows, Session 22 entries written.
+**Found but not fixed:** no customer identity yet (login persists only
+`yatra_login_hint`), so the page shows **all bookings on the device** —
+per-user scoping arrives with JWT auth (§3.3); wizard-band pages
+(searchFlight/booking/payment/eticket) kept out of the navbar change
+(slim band, author's call); no customer-side cancel (admin-bookings owns
+cancellation); deleted-booking seeds don't exist here — page reads the
+store as-is. Two write-glitch artifacts in the first drafts (HTML shell +
+css tokens + an entity in escapeHtml) were caught and fixed pre-verify.
+**Next up:** item 16 mock-API refactor (config.js/mock-data.js/api.js —
+moves every store read/write behind apiGet/apiPost before the backend),
+or `admin-profile.html` (last admin page), or frontend test pass (item
+17) across the whole wizard + history flow.
+
+### Session 21 — 2026-09-15
+**Requested:** "Build admin-destinations.html to complete the manage section
+of the admin panel."
+**Done:**
+- `admin-destinations.html` + `assets/js/admin-destinations.js` (new):
+  destination CRUD (Master Plan §2.1 #7) — see Progress Log entry above.
+  Store `yatra_admin_destinations` self-seeds with the 11 searchFlight
+  airports; images are URL-shaped (Cloudinary mock per §3.5); codes locked
+  to the CITY map; in-use airports can be disabled but not deleted.
+- Sidebar: Destinations link activated on dashboard/flights/airlines/
+  bookings/users/payments/tickets/destinations — **Manage section complete**.
+- Tracker: file-map row added; Session 21 entries written.
+**Found but not fixed:** the storefront (search dropdowns, destinations
+page) doesn't read this store yet — it still uses its own CITY map until
+the item-16 api.js refactor connects them; the demo upload stores a data
+URL in the same column meant for a Cloudinary URL (clearly labelled in
+the UI); no storage-event live refresh (same as the other admin pages).
+**Next up:** `admin-profile.html` (last §2.1 page) and/or `my-bookings.html`
+(customer journey, checklist item 14), then the item-16 mock-API refactor
+(config.js/api.js/mock-data.js) before the backend starts.
+
+### Session 20 — 2026-09-15
+**Requested:** "Build admin-tickets.html with PNR and ticket-number search
+over the bookings store."
+**Done:**
+- `admin-tickets.html` + `assets/js/admin-tickets.js` (new): read-only
+  e-ticket search/view (Master Plan §2.1 #9) — see Progress Log entry
+  above. Tickets derived from `yatra_bookings`; no mutations (Part 5 rule);
+  Voided status mirrors booking cancellation from admin-bookings.
+- Sidebar: Tickets link activated on dashboard/flights/airlines/bookings/
+  users/payments/tickets (soon chips removed).
+- Tracker: file-map row added; Session 20 entries written.
+**Found but not fixed:** ticket "set" is one row per booking — per-
+passenger ticket numbers don't exist yet (the backend's Ticket entity
+will be 1:N with passengers); no storage-event live refresh (same as
+the other admin pages); page has no print/PDF action (customer-side
+eticket.html owns printing).
+**Next up:** `my-bookings.html` (customer journey, checklist item 14,
+reads `yatra_bookings`) — then only `admin-destinations.html`,
+`admin-profile.html` and legacy `admin.html` remain in the admin phase,
+plus the item-16 mock-API refactor before the backend starts.
+
+### Session 19 — 2026-09-15
+**Requested:** "Build admin-users.html so the dashboard's Total Users stat
+stops being a demo value."
+**Done:**
+- `admin-users.html` + `assets/js/admin-users.js` (new): user management
+  CRUD (Master Plan §2.1 #6) — see Progress Log entry above. Store
+  `yatra_admin_users` self-seeds (10 users) so the dashboard reads a real
+  count; admin accounts protected (edit yes, disable/delete no); no
+  password field (backend BCrypt later); deletes keep bookings.
+- `assets/js/admin-dashboard.js`: Total Users reads `yatra_admin_users`
+  (fallback = seed size 10 while the store is empty, same rule as
+  airlines/flights) — **last demo stat gone**; header comment updated.
+- `assets/css/admin.css`: `.user-cell` (+ `.user-cell-info`) avatar +
+  stacked name/email table cell.
+- Sidebar: Users link activated on dashboard/flights/airlines/bookings/
+  payments/users (soon chips removed).
+- Tracker: file-map rows added/updated; Session 19 entries written.
+**Found but not fixed:** the storefront signup/login pages still persist
+nothing (`yatra_login_hint` only) — signup writing into
+`yatra_admin_users` is a possible bridge until the backend exists;
+users are not linked to bookings by id (both stores snapshot names); no
+`storage`-event live refresh (same as dashboard/payments).
+**Next up:** `admin-tickets.html` (PNR/ticket search — last §2.1 table
+page besides destinations) or `my-bookings.html` (customer journey,
+reads `yatra_bookings`), then the item-16 mock-API refactor.
+
+### Session 18 — 2026-09-15
+**Requested:** "read the md files … tell me where the last work was left and
+suggest me what to do in admin page" → options offered, author picked
+**admin-payments.html** (recommended: payment data already exists in
+`yatra_bookings`, §3.6 explicitly planned the page).
+**Done:**
+- `admin-payments.html` + `assets/js/admin-payments.js` (new): eSewa
+  transaction monitoring (Master Plan §2.1 #8 / §3.6) — see Progress Log
+  entry above. No payments store: txns derived from `yatra_bookings`
+  (`payment` object per booking); read-mostly, refund = paymentStatus
+  change Paid → Refunded (+ `payment.refundedAt`) written back to the
+  shared store so admin-bookings.html stays consistent automatically.
+- `assets/css/admin.css`: `.empty-state .empty-hint` (+ primary link color).
+- Sidebar: Payments link activated on dashboard/flights/airlines/bookings/
+  payments (soon chips removed).
+- Tracker: file-map row added; Session 18 entries written.
+**Found but not fixed:** no Pending/Failed txns exist yet (the storefront
+only writes Paid on success — those statuses arrive with the backend
+PaymentService / mock gateway simulation §3.6); refunds do not free seats
+(consistent with the bookings-cancel rule); bookings read once at load —
+a `storage` listener could live-refresh later (same as dashboard).
+**Next up:** `admin-users.html` (kills the last dummy dashboard stat) or
+`admin-tickets.html` (PNR/ticket search from the same store); then
+`my-bookings.html` and the item-16 mock-API refactor.
+
+### Session 17 — 2026-09-15
+**Requested:** "Rewire the admin dashboard stat cards to read from the
+airlines, flights and bookings stores."
+**Done:**
+- `assets/js/admin-dashboard.js` (new): store-backed stat cards — Airlines
+  and Flights read their stores (fallback = seed sizes 4/6 with tooltips
+  while empty), Bookings/Today's are honest counts from `yatra_bookings`,
+  Revenue sums non-cancelled bookings (compact L/K format like the old
+  dummy), Pending counts paymentStatus Pending; Users stays a flagged demo
+  value (no user store yet).
+- Recent Bookings: static demo rows removed; tbody now renders live
+  `yatra_bookings` (newest first, 5/page, pagination, empty state) with
+  admin-bookings badge semantics.
+- `admin-dashboard.html`: ids on all stat values; "Add Flight" dummy button
+  now navigates to admin-flights.html; script tag for the new file.
+- Tracker: file-map row updated; Session 17 entries written.
+**Found but not fixed:** dashboard does not auto-refresh on storage changes
+from other tabs (a `storage` event listener could be added later);
+revenue counts seeds + live bookings together by design; users card still
+demo until admin-users.html.
+**Next up:** `my-bookings.html` (reads the same `yatra_bookings` store —
+finishes the graded customer journey), then `admin-payments.html`.
+
+### Session 16 — 2026-09-15
+**Requested:** "whad do you thing should we do next because I can't decide
+from your suggestioins" → options offered, author picked **Admin bookings
+(recommended)**: admin-bookings.html + shared booking store connecting the
+storefront to the admin panel.
+**Done:**
+- `assets/js/esewaConfirm.js`: on PAY success (after `yatra_transaction` is
+  saved) the completed checkout is persisted to localStorage
+  `yatra_bookings` — id `BKG*`, PNR + ticket no. derived exactly like
+  eticket.js (so admin record = printed e-ticket), customer from
+  booking.js's contact, passengers array, flight reference, amounts, payment
+  block, timestamps. Also increments `bookedSeats` on the matching
+  `yatra_admin_flights` flight (matched by no+from+to, capped at capacity) —
+  the flight table's Available count is now derived from real bookings.
+  Whole block in try/catch: store failures never block the e-ticket.
+- `admin-bookings.html` + `assets/js/admin-bookings.js`: read-mostly booking
+  management (Master Plan §2.1 #5) — see Progress Log entry above.
+- **First styled confirm modal** (`.modal-sm` + `.a-btn-danger`) — the
+  `confirm()` replacement Session 13 wanted; askConfirm() pattern reusable
+  by admin-airlines/flights later.
+- `assets/css/admin.css`: `.a-btn-danger`, `.modal-sm`, `.modal-wide`,
+  `.detail-grid`, `.detail-block`, `.pax-heading`, `.pax-table`,
+  `.confirm-msg`; ≤640px detail-grid collapses to one column.
+- Sidebar: Bookings link activated on dashboard/airlines/flights/bookings.
+- Tracker: file-map row added; Session 16 entries written.
+**Found but not fixed:** refunds are only *flagged* (paymentStatus stays
+Paid until admin-payments.html owns the refund action — by design);
+esewaConfirm seeds use `_seed: true` while storefront records don't, so the
+Reset-demo button keeps live data; my-bookings.html (spec item 14) can now
+read the same `yatra_bookings` store — still unbuilt.
+**Next up:** my-bookings.html on the same store (finishes the graded
+customer journey), then admin-payments.html; rewire dashboard stats to the
+real stores afterwards.
+
+### Session 15 — 2026-09-15
+**Requested:** "Build admin-flights.html with airline dropdown from the
+airlines store and the seat-capacity-only rule."
+**Done:**
+- `admin-flights.html` + `assets/js/admin-flights.js`: flight schedule CRUD
+  (Master Plan §2.1 #4) — see Progress Log entry above for the feature list.
+- **Airlines store integration:** the modal's airline dropdown and the
+  toolbar airline filter both read `yatra_admin_airlines` (read-only; owned
+  by admin-airlines.js) with a 4-carrier fallback; flights store `airlineId`.
+- **Seat-capacity-only rule:** Seat Capacity is the only seat input; no
+  available-seats field exists anywhere — the table renders Available =
+  capacity − booked from `bookedSeats` (system data, preserved on edit), and
+  the modal carries an inline explainer of the backend rule.
+- `assets/css/admin.css`: added `.cell-sub`, `.al-cell`, `.seat-out`,
+  `.form-hint.rule` (shared helpers, no duplication of existing components).
+- Sidebar: Flights link activated on admin-dashboard.html,
+  admin-airlines.html and admin-flights.html (was "soon" everywhere).
+- Tracker: file-map row added; Session 15 log entries written.
+**Found but not fixed:** data is localStorage-mock (swap to api.js in item
+16); delete still uses `confirm()` (styled confirm modal still wanted);
+`bookedSeats` is fabricated demo data until admin-bookings + the mock
+booking layer exist; flight dates are not modeled yet (schedules are
+time-of-day templates like searchFlight's, per-date inventory comes with
+the backend/mock-data.js refactor).
+**Next up:** `admin-destinations.html` (city/airport master data feeding the
+route dropdowns), then `admin-bookings.html` (which turns `bookedSeats` into
+real derived data); rewire dashboard stats to the stores afterwards.
+
+### Session 14 — 2026-09-15
+**Requested:** "there are only 4 airline. I have removed summit airline.
+update my project accordingly and suggest what should I build in admin side."
+**Done:**
+- Roster audit: `searchFlight.js` flight data already had only the 4 carriers
+  (author removed Summit there first) and no code referenced the deleted
+  `airline-yeti.png` — only `airline-buddha.jpg`, `airline-yeti.jpg`,
+  `airline-shree.svg`, `airline-sita.jpeg` are used. Stale spots: the admin
+  airlines seed, the dashboard stat card and the docs.
+- `assets/js/admin-airlines.js`: Summit Air seed row removed; `load()` gained
+  a one-line migration that filters stored records with `iata === 'RM'` so
+  previously-saved `yatra_admin_airlines` data self-heals on next load.
+- `admin-dashboard.html`: Total Airlines stat 5 → 4; sidebar Airlines link
+  pointed at `admin-airlines.html` + activated (it still showed the Session-12
+  "soon" chip that Session 13 only fixed on admin-airlines.html itself).
+- `Yatra_2.0_Master_Plan.md` (§Airlines Represented) and this tracker
+  (checklist 5b, file map, Progress Log) synced; Summit references in older
+  log entries left as history.
+- Admin-side build-order suggestion given (Flights → Destinations → Bookings
+  → Payments/Tickets → Users → Profile) — see Session 14 Progress Log entry.
+**Found but not fixed:** nothing new — pre-existing open items unchanged
+(see §50).
+**Next up:** `admin-flights.html` per Session 13's plan (capacity-only seat
+rule, airline dropdown from the airlines store), then
+`admin-destinations.html`.
+
+### Session 13 — 2026-09-14
+**Requested:** "in admin-login instead of brand badge add the logo" → "Build
+admin-airlines.html with full mock CRUD, logo upload preview,
+search/filter/pagination."
+**Done:**
+- admin-login.html: `.brand-badge` (green plane tile) → real
+  `Yatra-logo-black.png` at 42px (navbar height), class `.brand-logo`.
+- `admin-airlines.html` + `assets/js/admin-airlines.js`: full mock CRUD —
+  see Progress Log entry above for the feature list.
+- `assets/css/admin.css`: added the reusable CRUD components (toolbar/
+  search/filter, a-field/a-input/a-select/a-textarea + form-grid + validation
+  states, upload-row/preview, modal trio, logo-chip + fallback, row-actions
+  icon buttons, admin-wide toast) — admin-flights/destinations/etc. reuse
+  them without new CSS.
+- Tracker: file-map rows added/updated; sidebar Airlines link activated.
+**Found but not fixed:** data is localStorage-mock (swap to api.js in item
+16); logo upload is client-side preview only (real BLOB endpoint = backend
+Phase 4); delete uses `confirm()` until a styled confirm modal is wanted.
+**Next up:** `admin-flights.html` (capacity-only seat rule — NO available-
+seats input, airline dropdown from the airlines store, auto seat-row note),
+then `admin-destinations.html` (Cloudinary-style URL field).
+
+### Session 12 — 2026-09-14
+**Requested:** "Now I will be entirely focusing on admin side. At first I
+will make its frontend then move towards backend" → "Scaffold the shared
+admin sidebar/header and admin-login.html."
+**Done:**
+- `assets/css/admin.css`: shared ADMIN design system, self-contained (no
+  homeLogged.css — admin is deliberately a distinct dashboard look per
+  Master Plan §2.4): same brand tokens + admin-only tokens (sidebar width,
+  badge palettes), fixed dark sidebar with brand header, nav sections
+  (Dashboard / Manage / Account), active + "soon" nav states, footer user
+  chip, sticky topbar (toggle + title + view-site + admin chip), page-header,
+  buttons, cards, stat-grid, data-table, status badges (success/warning/
+  danger/info/neutral), pagination, empty state, ≤1024px off-canvas sidebar,
+  reduced-motion block.
+- `assets/js/admin.js`: mock session guard (`yatra_admin_session`, role
+  ADMIN — shape mirrors the future JWT payload), redirect to admin-login
+  when absent, identity fill (topbar chip + sidebar), `data-admin-page`
+  active-link + topbar title, mobile sidebar toggle/backdrop/Escape, logout.
+- `admin-login.html`: standalone dark login (brand badge, email/username +
+  password w/ visibility toggle, keep-signed-in, validation, toast, mock
+  800ms auth → dashboard), demo-hint documenting that real auth =
+  POST /api/auth/login + JWT role check later. Redirects to dashboard if a
+  session already exists.
+- `admin-dashboard.html`: first shell page — full sidebar block (to be
+  copied into every admin page), topbar, page header, all 7 §2.5 stat cards
+  (Total Users 1,248 / Flights 86 / Airlines 5 / Bookings 3,512 / Today's 27 /
+  Revenue NPR 42.6L / Pending Payments 9 — dummy), recent-bookings table
+  demoing badges + pagination.
+- Verified: node --check OK, admin.css 93/93 braces, no broken links or
+  missing assets on both pages; file map + §49 updated.
+**Found but not fixed:** stat numbers are dummies until
+`GET /api/admin/dashboard` (backend phase); pages Flights→Profile not built
+yet (sidebar "soon" chips); legacy `admin.html` untouched (protected).
+**Next up:** `admin-airlines.html` as the reference CRUD page (smallest
+entity, Master Plan §4.2), then `admin-flights.html`; my-bookings.html
+(checklist item 14) still open on the customer side.
 
 ### Session 11 — 2026-09-14
 **Requested:** "do this — fold project.md's conventions into the tracker
